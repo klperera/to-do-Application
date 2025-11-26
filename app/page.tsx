@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-blue-50 via-white to-purple-50 px-4">
       <div className="text-center max-w-3xl mx-auto">
         <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-gray-900 mb-6">
           Welcome to Task Master
