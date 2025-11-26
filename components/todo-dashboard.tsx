@@ -193,7 +193,7 @@ export function TodoDashboard({ user }: { user: User }) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Your Tasks</CardTitle>
+            <CardTitle>To Do List</CardTitle>
             <CardDescription>
               {user.role === "user"
                 ? "Manage your personal tasks"
