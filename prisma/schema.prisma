@@ -16,8 +16,6 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
-  password      String
-  role          Role      @default(USER)
   todos         Todo[]
   createdAt     DateTime  @default(now())
   name          String
@@ -26,6 +24,12 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+
+  role String?
 
   @@map("user")
 }
@@ -40,12 +44,6 @@ model Todo {
   createdAt DateTime @default(now())
 }
 
-enum Role {
-  USER
-  MANAGER
-  ADMIN
-}
-
 model Session {
   id        String   @id
   expiresAt DateTime
@@ -56,6 +54,8 @@ model Session {
   userAgent String?
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  impersonatedBy String?
 
   @@unique([token])
   @@index([userId])
