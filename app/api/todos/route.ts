@@ -117,8 +117,8 @@ export async function POST(request: NextRequest) {
 
 const updateTodoSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  description: z.string().max(1000).optional(),
-  completed: z.boolean().optional(),
+  content: z.string().max(1000).optional(),
+  isDone: z.boolean().optional(),
 });
 
 export async function PATCH(
@@ -158,7 +158,7 @@ export async function PATCH(
     const validatedData = updateTodoSchema.parse(body);
 
     // BACKEND AUTHORIZATION - Critical requirement
-    if (user.role === "USER") {
+    if (user.role === "user") {
       // Users can only update their own todos
       if (todo.userId !== user.id) {
         return NextResponse.json(
@@ -166,7 +166,7 @@ export async function PATCH(
           { status: 403 }
         );
       }
-    } else if (user.role === "MANAGER") {
+    } else if (user.role === "manager") {
       // Managers can only mark todos as complete/incomplete
       const isOnlyCompletedChange = 
         Object.keys(validatedData).length === 1 && 
@@ -245,7 +245,7 @@ export async function DELETE(
     }
 
     // BACKEND AUTHORIZATION - Critical requirement
-    if (user.role === "USER") {
+    if (user.role === "user") {
       // Users can only delete their own todos
       if (todo.userId !== user.id) {
         return NextResponse.json(
@@ -253,7 +253,7 @@ export async function DELETE(
           { status: 403 }
         );
       }
-    } else if (user.role === "MANAGER") {
+    } else if (user.role === "manager") {
       // Managers cannot delete any todos
       return NextResponse.json(
         { error: "Managers cannot delete todos" },

@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Trash2, Plus, LogOut } from "lucide-react";
+import { Trash2, Plus, LogOut, Check, Flag } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { signOut } from "@/app/actions/auth";
 
@@ -25,6 +24,7 @@ interface Todo {
   isDone: boolean;
   userId: string;
   createdAt: string;
+  user: User;
 }
 
 interface User {
@@ -95,10 +95,15 @@ export function TodoDashboard({ user }: { user: User }) {
   };
 
   const handleToggleTodo = async (todo: Todo) => {
+    // Only allow toggle if user owns the todo OR is a manager/admin
+    if (todo.userId !== user.id && !isManager) {
+      return;
+    }
+
     console.log("Toggling todo:", todo);
     try {
-      await fetch(`/api/todos/${todo.id}`, {
-        method: "PUT",
+      await fetch(`/api/todos?id=${todo.id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -124,10 +129,6 @@ export function TodoDashboard({ user }: { user: User }) {
 
   const handleLogout = async () => {
     await signOut();
-  };
-
-  const canEditTodo = (todo: Todo) => {
-    return todo.userId === user.id || isAdmin;
   };
 
   const canDeleteTodo = (todo: Todo) => {
@@ -259,12 +260,15 @@ export function TodoDashboard({ user }: { user: User }) {
                       key={todo.id}
                       className="group flex items-start gap-4 p-5 border-2 border-gray-100 rounded-xl hover:border-gray-300 hover:shadow-lg bg-gradient-to-r from-white to-gray-50 hover:from-gray-100 hover:to-gray-200 transition-all duration-200 transform hover:-translate-y-1"
                     >
-                      <Checkbox
-                        checked={todo.isDone}
-                        onChange={() => handleToggleTodo(todo)}
-                        disabled={!canEditTodo(todo) && !isManager}
-                        className="mt-1.5 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-gray-700 data-[state=checked]:to-black border-2"
-                      />
+                      <div className="mt-1">
+                        <Flag
+                          className={`w-6 h-6 transition-colors ${
+                            todo.isDone
+                              ? "fill-green-600 text-green-600"
+                              : "fill-gray-300 text-gray-300"
+                          }`}
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p
                           className={`font-semibold text-base ${
@@ -283,20 +287,40 @@ export function TodoDashboard({ user }: { user: User }) {
                         <p className="text-xs text-gray-500 mt-3 flex items-center gap-1">
                           <span className="font-medium">Created by:</span>
                           <span className="text-gray-900 font-semibold">
-                            {todo.userId === user.id ? "You" : todo.userId}
+                            {todo.userId === user.id ? "You" : todo.user.name}
                           </span>
                         </p>
                       </div>
-                      {canDeleteTodo(todo) && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteTodo(todo.id)}
-                          className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-white hover:bg-gray-800 transition-all duration-200 rounded-lg"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
+                      <div className="flex gap-2">
+                        {(todo.userId === user.id || isManager) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleTodo(todo)}
+                            className={`${
+                              todo.isDone
+                                ? "text-gray-600 hover:text-white hover:bg-gray-600"
+                                : "text-green-600 hover:text-white hover:bg-green-600"
+                            } transition-all duration-200 rounded-lg`}
+                            title={
+                              todo.isDone ? "Mark as undone" : "Mark as done"
+                            }
+                          >
+                            <Check className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {canDeleteTodo(todo) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTodo(todo.id)}
+                            className="text-gray-600 hover:text-white hover:bg-gray-800 transition-all duration-200 rounded-lg"
+                            title="Delete task"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -305,9 +329,7 @@ export function TodoDashboard({ user }: { user: User }) {
           </Card>
 
           {isManager && (
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-gray-800 to-black text-white overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+            <Card className="shadow-xl border-0 bg-gradient-to-r from-gray-600 to-gray-800 text-white overflow-hidden relative">
               <CardHeader className="relative z-10">
                 <CardTitle className="text-2xl font-bold text-white flex items-center gap-2">
                   <span className="text-3xl">👑</span>
