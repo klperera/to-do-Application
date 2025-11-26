@@ -157,7 +157,7 @@ export async function PATCH(
     const body = await request.json();
     const validatedData = updateTodoSchema.parse(body);
 
-    // BACKEND AUTHORIZATION - Critical requirement
+
     if (user.role === "user") {
       // Users can only update their own todos
       if (todo.userId !== user.id) {
@@ -244,7 +244,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Todo not found" }, { status: 404 });
     }
 
-    // BACKEND AUTHORIZATION - Critical requirement
     if (user.role === "user") {
       // Users can only delete their own todos
       if (todo.userId !== user.id) {
