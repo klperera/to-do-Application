@@ -329,9 +329,7 @@ export function TodoDashboard({ user }: { user: User }) {
           </Card>
 
           {isManager && (
-            <Card className="shadow-xl border-0 bg-gradient-to-r from-gray-800 to-black text-white overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
-              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+            <Card className="shadow-xl border-0 bg-gradient-to-r from-gray-600 to-gray-800 text-white overflow-hidden relative">
               <CardHeader className="relative z-10">
                 <CardTitle className="text-2xl font-bold text-white flex items-center gap-2">
                   <span className="text-3xl">👑</span>
